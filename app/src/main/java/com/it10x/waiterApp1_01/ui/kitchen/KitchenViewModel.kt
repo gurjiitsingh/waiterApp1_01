@@ -730,6 +730,285 @@ class KitchenViewModel(
     }
 
 
+
+    // =====================================================
+// SAVE WAITER KOT LOCALLY AFTER DESKTOP ACCEPTS KOT
+// =====================================================
+
+    private suspend fun saveWaiterKotLocally(
+        orderType: String,
+        sessionId: String,
+        tableNo: String,
+        tableName: String,
+        cartItems: List<PosCartEntity>,
+        deviceId: String,
+        deviceName: String?,
+        appVersion: String,
+        role: String
+    ): Boolean = withContext(Dispatchers.IO) {
+
+        try {
+
+            if (cartItems.isEmpty()) {
+                Log.w(
+                    "WAITER_LOCAL_KOT",
+                    "Cart is empty. Nothing to save."
+                )
+                return@withContext false
+            }
+
+            val db =
+                AppDatabaseProvider.get(
+                    printerManager.appContext()
+                )
+
+            val kotBatchDao =
+                db.kotBatchDao()
+
+            val kotItemDao =
+                db.kotItemDao()
+
+            // -------------------------------------------------
+            // GENERATE LOCAL BATCH ID
+            // -------------------------------------------------
+
+            val batchId =
+                UUID.randomUUID().toString()
+
+            val now =
+                System.currentTimeMillis()
+
+            // -------------------------------------------------
+            // GENERATE KOT NUMBER
+            // -------------------------------------------------
+
+            val kotNumber =
+                kotRepository.generateNextKotNumber()
+
+            // -------------------------------------------------
+            // CREATE BATCH
+            // -------------------------------------------------
+
+            val batch =
+                PosKotBatchEntity(
+
+                    id =
+                        batchId,
+
+                    kotNumber =
+                        kotNumber,
+
+                    sessionId =
+                        sessionId,
+
+                    tableNo =
+                        tableNo,
+
+                    tableName =
+                        tableName,
+
+                    orderType =
+                        orderType,
+
+                    deviceId =
+                        deviceId,
+
+                    deviceName =
+                        deviceName,
+
+                    appVersion =
+                        appVersion,
+
+                    createdAt =
+                        now,
+
+                    sentBy =
+                        "WAITER",
+
+                    syncStatus =
+                        "DONE",
+
+                    lastSyncedAt =
+                        null
+                )
+
+            kotBatchDao.insert(batch)
+
+            Log.d(
+                "WAITER_LOCAL_KOT",
+                "Batch saved: $batchId"
+            )
+
+            // -------------------------------------------------
+            // CREATE ITEMS
+            // -------------------------------------------------
+
+            val items =
+                cartItems.map { cart ->
+
+                    PosKotItemEntity(
+
+                        id =
+                            UUID.randomUUID().toString(),
+
+                        kotNumber =
+                            kotNumber,
+
+                        sessionId =
+                            sessionId,
+
+                        kotBatchId =
+                            batchId,
+
+                        tableNo =
+                            tableNo,
+
+                        tableName =
+                            tableName,
+
+                        productId =
+                            cart.productId,
+
+                        name =
+                            cart.name,
+
+                        productMode =
+                            cart.productMode,
+
+                        currentStock =
+                            cart.currentStock,
+
+                        categoryId =
+                            cart.categoryId,
+
+                        categoryName =
+                            cart.categoryName,
+
+                        createdById =
+                            cart.createdById,
+
+                        createdByName =
+                            cart.createdByName,
+
+                        parentId =
+                            cart.parentId,
+
+                        isVariant =
+                            cart.isVariant,
+
+                        basePrice =
+                            cart.basePrice,
+
+                        finalPrice =
+                            cart.finalPrice,
+
+                        modifierTotal =
+                            cart.modifierTotal,
+
+                        quantity =
+                            cart.quantity,
+
+                        taxRate =
+                            cart.taxRate,
+
+                        taxType =
+                            cart.taxType,
+
+                        note =
+                            cart.note,
+
+                        modifiersJson =
+                            cart.modifiersJson,
+
+                        kitchenPrintReq =
+                            cart.kitchenPrintReq,
+
+                        kitchenPrinted =
+                            true,
+
+                        status =
+                            "DONE",
+
+                        createdAt =
+                            now
+                    )
+                }
+
+            // -------------------------------------------------
+            // SAVE ITEMS TO BILL VIEW
+            // -------------------------------------------------
+
+            kotRepository.insertItemsInBill(
+                tableNo,
+                items,
+                role
+            )
+
+            // -------------------------------------------------
+            // UPDATE LOCAL COUNTERS
+            // -------------------------------------------------
+
+            kotRepository.markDoneAll(
+                tableNo
+            )
+
+            kotRepository.syncKinchenCount(
+                tableNo
+            )
+
+            kotRepository.syncBillCount(
+                tableNo
+            )
+
+            Log.d(
+                "WAITER_LOCAL_KOT",
+                "===================================="
+            )
+
+            Log.d(
+                "WAITER_LOCAL_KOT",
+                "LOCAL WAITER KOT SAVED"
+            )
+
+            Log.d(
+                "WAITER_LOCAL_KOT",
+                "KOT: $kotNumber"
+            )
+
+            Log.d(
+                "WAITER_LOCAL_KOT",
+                "Table: $tableNo"
+            )
+
+            Log.d(
+                "WAITER_LOCAL_KOT",
+                "Items: ${items.size}"
+            )
+
+            Log.d(
+                "WAITER_LOCAL_KOT",
+                "===================================="
+            )
+
+            true
+
+        } catch (e: Exception) {
+
+            Log.e(
+                "WAITER_LOCAL_KOT",
+                "Failed to save local waiter KOT",
+                e
+            )
+
+            false
+        }
+    }
+
+
+
+
+
+
 }
 
 
