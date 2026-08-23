@@ -85,8 +85,10 @@ class WaiterKitchenViewModel(
 
     private val db =
         AppDatabaseProvider.get(app)
-    private val waiterLanRepository =
+
+        private val waiterLanRepository =
         WaiterLanRepository(
+            context = app.applicationContext,
             posTerminalDao = db.posTerminalDao()
         )
 

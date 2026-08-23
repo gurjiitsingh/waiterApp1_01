@@ -104,6 +104,7 @@ import androidx.compose.runtime.collectAsState
 import com.it10x.waiterApp1_01.auth.PosLoginViewModel
 import com.it10x.waiterApp1_01.ui.login.PosLoginScreen
 import com.it10x.waiterApp1_01.auth.PosSessionManager
+import com.it10x.waiterApp1_01.data.pos.lan.WaiterLanManager
 import com.it10x.waiterApp1_01.viewmodel.ProductSyncViewModel
 
 class MainActivity : ComponentActivity() {
@@ -114,6 +115,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
        // val role = PosRoleManager.getRole(this)
         val db = AppDatabaseProvider.get(this)
+
+        WaiterLanManager.start(this)
 
         //PRINTER SETTING UPLOAD
         // ================= PRINTER SYSTEM =================

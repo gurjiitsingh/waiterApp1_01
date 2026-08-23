@@ -11,9 +11,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
-
+import android.content.Context
+import android.widget.Toast
 
 class WaiterLanRepository(
+    private val context: Context,
     private val posTerminalDao: PosTerminalDao
 ) {
 
@@ -31,6 +33,9 @@ class WaiterLanRepository(
             val terminal =
                 posTerminalDao.getActiveTerminal()
 
+
+
+
             if (terminal == null) {
 
                 Log.e(
@@ -41,6 +46,21 @@ class WaiterLanRepository(
                 null
 
             } else {
+
+//                val ip =
+//                    terminal.ipAddress
+//
+//                val port =
+//                    terminal.port
+//
+//                val url =
+//                    "http://$ip:$port/"
+//
+//                Toast.makeText(
+//                    context,
+//                    "Sending KOT to:\n$ip:$port",
+//                    Toast.LENGTH_LONG
+//                ).show()
 
                 if (terminal.ipAddress.isBlank()) {
 
