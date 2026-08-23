@@ -38,6 +38,7 @@ import com.it10x.waiterApp1_01.data.online.models.waiter.WaiterOrder
 import com.it10x.waiterApp1_01.data.online.models.waiter.WaiterOrderItem
 
 import com.it10x.waiterApp1_01.data.pos.repository.WaiterKitchenRepository
+import com.it10x.waiterApp1_01.data.pos.repository.WaiterLanRepository
 
 import kotlinx.coroutines.tasks.await
 class WaiterKitchenViewModel(
@@ -65,6 +66,12 @@ class WaiterKitchenViewModel(
     private val kotToBillUseCase =
         KotToBillUseCase(kotItemDao)
 
+    private val kotRepository = KotRepository(
+        AppDatabaseProvider.get(app).kotBatchDao(),
+        AppDatabaseProvider.get(app).kotItemDao(),
+        AppDatabaseProvider.get(app).tableDao()
+    )
+
     val kotItems: StateFlow<List<PosKotItemEntity>> =
         kotItemDao.getAllKotItems()
             .stateIn(
@@ -75,11 +82,10 @@ class WaiterKitchenViewModel(
 
     private var isProcessing = false
 
-    private val kotRepository = KotRepository(
-        AppDatabaseProvider.get(app).kotBatchDao(),
-        AppDatabaseProvider.get(app).kotItemDao(),
-        AppDatabaseProvider.get(app).tableDao()
-    )
+
+
+    private val waiterLanRepository =
+        WaiterLanRepository()
 
     private val cartRepository = CartRepository(
         AppDatabaseProvider.get(app).cartDao(),
@@ -97,7 +103,7 @@ class WaiterKitchenViewModel(
         deviceName: String?,
         role: String
     ) {
-        Log.d("KOT_DEBUG","WaiterKitchenViewModel is sending Waiter kot--------------")
+        Log.d("WaiterKitchenVM","WaiterKitchenViewModel is sending Waiter kot--------------")
         // ✅ Prevent double click immediately
         if (isProcessing) return
         isProcessing = true
@@ -143,13 +149,39 @@ class WaiterKitchenViewModel(
                     )
                 }
 
+//                val success = withContext(Dispatchers.IO) {
+//                    waiterKitchenRepository.sendOrderToFireStore(
+//                        cartList = latestCart,
+//                        tableNo = tableNo,
+//                        tableName = tableName,
+//                        sessionId = sessionId,
+//
+//                        orderType = orderType,
+//                        deviceId = deviceId,
+//                        deviceName = deviceName
+//                    )
+//                }
+
+
+                //                if (!success) {
+//                    Log.e(
+//                        "WaiterKitchenVM",
+//                        "❌ Firestore upload failed"
+//                    )
+//                    return@launch
+//                }
+
+//                val success = withContext(Dispatchers.IO) {
+//                    waiterLanRepository.pingDesktop()
+//                }
+
                 val success = withContext(Dispatchers.IO) {
-                    waiterKitchenRepository.sendOrderToFireStore(
+
+                    waiterLanRepository.sendOrderToDesktop(
                         cartList = latestCart,
                         tableNo = tableNo,
                         tableName = tableName,
                         sessionId = sessionId,
-
                         orderType = orderType,
                         deviceId = deviceId,
                         deviceName = deviceName
@@ -157,19 +189,36 @@ class WaiterKitchenViewModel(
                 }
 
                 if (!success) {
+
                     Log.e(
                         "WaiterKitchenVM",
-                        "❌ Firestore upload failed"
+                        "❌ Desktop LAN KOT send failed"
+                    )
+
+                    return@launch
+                }
+
+                Log.d(
+                    "WaiterKitchenVM",
+                    "✅ Desktop LAN KOT sent successfully"
+                )
+
+                if (!success) {
+                    Log.e(
+                        "WaiterKitchenVM",
+                        "❌ Desktop LAN ping failed"
                     )
                     return@launch
                 }
 
-                repository.clearCart(orderType, tableNo)
-                cartRepository.syncCartCount(tableNo)
+
+
+//                repository.clearCart(orderType, tableNo)
+//                cartRepository.syncCartCount(tableNo)
 
                 Log.d(
                     "WaiterKitchenVM",
-                    "✅ Firestore + Bill saved successfully"
+                    "✅ KOT send succefully"
                 )
 
                 _sendSuccess.value = true
