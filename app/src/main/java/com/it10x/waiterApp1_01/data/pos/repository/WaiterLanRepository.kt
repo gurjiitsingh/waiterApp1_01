@@ -4,50 +4,143 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.it10x.waiterApp1_01.data.pos.dao.PosTerminalDao
 import com.it10x.waiterApp1_01.data.pos.entities.PosCartEntity
 import com.it10x.waiterApp1_01.network.WaiterLanClient
-import java.util.UUID
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 
-class WaiterLanRepository {
 
-    private val gson = Gson()
+class WaiterLanRepository(
+    private val posTerminalDao: PosTerminalDao
+) {
+
+    private val gson =
+        Gson()
+
+
+    // =====================================================
+    // GET POS API
+    // =====================================================
+
+    private suspend fun getPosApi() =
+        try {
+           // logPosTerminal()
+            val terminal =
+                posTerminalDao.getActiveTerminal()
+
+            if (terminal == null) {
+
+                Log.e(
+                    "WAITER_LAN",
+                    "No active POS terminal found in Room"
+                )
+
+                null
+
+            } else {
+
+                if (terminal.ipAddress.isBlank()) {
+
+                    Log.e(
+                        "WAITER_LAN",
+                        "POS terminal IP address is empty"
+                    )
+
+                    null
+
+                } else {
+
+                    Log.d(
+                        "WAITER_LAN",
+                        "Connecting to POS ${terminal.ipAddress}:${terminal.port}"
+                    )
+
+                    WaiterLanClient.createApi(
+                        ipAddress =
+                            terminal.ipAddress,
+                        port =
+                            terminal.port
+                    )
+                }
+
+            }
+
+        } catch (e: Exception) {
+
+            Log.e(
+                "WAITER_LAN",
+                "Failed to get POS terminal",
+                e
+            )
+
+            null
+        }
+
 
     // =====================================================
     // PING DESKTOP
     // =====================================================
 
     suspend fun pingDesktop(): Boolean {
-        return try {
-            Log.d("WAITER_LAN", "Pinging desktop...")
 
-            val response = WaiterLanClient.api.ping()
+        return try {
+
+            Log.d(
+                "WAITER_LAN",
+                "Pinging desktop..."
+            )
+
+
+            val api =
+                getPosApi()
+
+
+            if (api == null) {
+
+                return false
+
+            }
+
+
+            val response =
+                api.ping()
+
 
             if (response.isSuccessful) {
+
                 Log.d(
                     "WAITER_LAN",
                     "Desktop ping successful: ${response.body()}"
                 )
+
                 true
+
             } else {
+
                 Log.e(
                     "WAITER_LAN",
                     "Ping failed: HTTP ${response.code()}"
                 )
+
                 false
             }
 
+
         } catch (e: Exception) {
+
             Log.e(
                 "WAITER_LAN",
                 "Desktop ping exception",
                 e
             )
+
             false
         }
     }
+
 
     // =====================================================
     // SEND KOT
@@ -62,24 +155,59 @@ class WaiterLanRepository {
         deviceId: String,
         deviceName: String?,
     ): Boolean {
-
+     //   logPosTerminal()
         return try {
 
             if (cartList.isEmpty()) {
-                Log.e("WAITER_LAN", "Cart is empty")
+
+                Log.e(
+                    "WAITER_LAN",
+                    "Cart is empty"
+                )
+
                 return false
             }
 
-            val now = System.currentTimeMillis()
+
+            // =================================================
+            // GET POS
+            // =================================================
+
+            val api =
+                getPosApi()
+
+
+            if (api == null) {
+
+                Log.e(
+                    "WAITER_LAN",
+                    "POS terminal unavailable"
+                )
+
+                return false
+            }
+
+
+            // =================================================
+            // TIME
+            // =================================================
+
+            val now =
+                System.currentTimeMillis()
+
 
             val businessDate =
                 SimpleDateFormat(
                     "yyyy-MM-dd",
                     Locale.getDefault()
-                ).format(Date(now))
+                ).format(
+                    Date(now)
+                )
+
 
             val kotBatchId =
                 UUID.randomUUID().toString()
+
 
             // =================================================
             // BATCH
@@ -93,7 +221,6 @@ class WaiterLanRepository {
                         kotBatchId
                     )
 
-                    // Electron generates the actual KOT number
                     addProperty(
                         "kotNumber",
                         ""
@@ -160,12 +287,14 @@ class WaiterLanRepository {
                     )
                 }
 
+
             // =================================================
             // ITEMS
             // =================================================
 
             val items =
                 JsonArray()
+
 
             cartList.forEach { cartItem ->
 
@@ -187,10 +316,10 @@ class WaiterLanRepository {
                             cartItem.categoryName ?: ""
                         )
 
-                        // Required by Electron SQLite
                         addProperty(
                             "productMode",
-                            cartItem.productMode ?: "raw_stock"
+                            cartItem.productMode
+                                ?: "raw_stock"
                         )
 
                         addProperty(
@@ -200,7 +329,8 @@ class WaiterLanRepository {
 
                         addProperty(
                             "sessionId",
-                            cartItem.sessionId ?: sessionId
+                            cartItem.sessionId
+                                ?: sessionId
                         )
 
                         addProperty(
@@ -280,7 +410,8 @@ class WaiterLanRepository {
 
                         addProperty(
                             "taxType",
-                            cartItem.taxType ?: "exclusive"
+                            cartItem.taxType
+                                ?: "exclusive"
                         )
 
                         addProperty(
@@ -329,8 +460,10 @@ class WaiterLanRepository {
                         )
                     }
 
+
                 items.add(item)
             }
+
 
             // =================================================
             // FINAL REQUEST
@@ -349,6 +482,11 @@ class WaiterLanRepository {
                         items
                     )
                 }
+
+
+            // =================================================
+            // LOG
+            // =================================================
 
             Log.d(
                 "WAITER_LAN",
@@ -380,14 +518,16 @@ class WaiterLanRepository {
                 "===================================="
             )
 
+
             // =================================================
             // SEND
             // =================================================
 
             val response =
-                WaiterLanClient.api.sendKot(
+                api.sendKot(
                     request
                 )
+
 
             // =================================================
             // RESPONSE
@@ -413,6 +553,7 @@ class WaiterLanRepository {
                     response.errorBody()
                         ?.string()
 
+
                 Log.e(
                     "WAITER_LAN",
                     "KOT rejected"
@@ -431,6 +572,7 @@ class WaiterLanRepository {
                 false
             }
 
+
         } catch (e: Exception) {
 
             Log.e(
@@ -440,6 +582,86 @@ class WaiterLanRepository {
             )
 
             false
+        }
+    }
+
+
+    private suspend fun logPosTerminal() {
+
+        try {
+
+            val terminal =
+                posTerminalDao.getActiveTerminal()
+
+            if (terminal == null) {
+
+                Log.e(
+                    "WAITER_LAN",
+                    "❌ NO ACTIVE POS TERMINAL FOUND IN ROOM"
+                )
+
+                return
+            }
+
+            Log.d(
+                "WAITER_LAN",
+                "===================================="
+            )
+
+            Log.d(
+                "WAITER_LAN",
+                "POS TERMINAL FROM ROOM"
+            )
+
+            Log.d(
+                "WAITER_LAN",
+                "Terminal ID: ${terminal.terminalId}"
+            )
+
+            Log.d(
+                "WAITER_LAN",
+                "Terminal Name: ${terminal.terminalName}"
+            )
+
+            Log.d(
+                "WAITER_LAN",
+                "Outlet ID: ${terminal.outletId}"
+            )
+
+            Log.d(
+                "WAITER_LAN",
+                "IP ADDRESS: ${terminal.ipAddress}"
+            )
+
+            Log.d(
+                "WAITER_LAN",
+                "PORT: ${terminal.port}"
+            )
+
+            Log.d(
+                "WAITER_LAN",
+                "ACTIVE: ${terminal.isActive}"
+            )
+
+            Log.d(
+                "WAITER_LAN",
+                "URL: http://${terminal.ipAddress}:${terminal.port}/"
+            )
+
+            Log.d(
+                "WAITER_LAN",
+                "===================================="
+
+            )
+
+        } catch (e: Exception) {
+
+            Log.e(
+                "WAITER_LAN",
+                "❌ Failed to read POS terminal from Room",
+                e
+            )
+
         }
     }
 }

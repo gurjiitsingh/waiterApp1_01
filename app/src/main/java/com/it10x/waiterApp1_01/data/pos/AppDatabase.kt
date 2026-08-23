@@ -1,5 +1,6 @@
 package com.it10x.waiterApp1_01.data.pos
 
+import com.it10x.waiterApp1_01.data.pos.entities.PosTerminalEntity
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.it10x.waiterApp1_01.data.inventory.dao.ProductRecipeDao
@@ -46,8 +47,9 @@ import androidx.room.Entity
         PosBusinessDayEntity::class,
         OrderCounterEntity::class,
         OrderSerialMapEntity::class,
+        PosTerminalEntity::class,
     ],
-    version = 141,              // ⬆️ increment version since schema changed
+    version = 142,              // ⬆️ increment version since schema changed
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -92,5 +94,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun orderCounterDao(): OrderCounterDao
 
     abstract fun orderSerialMapDao(): OrderSerialMapDao
+
+    abstract fun posTerminalDao(): PosTerminalDao
 
 }

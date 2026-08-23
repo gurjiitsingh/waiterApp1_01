@@ -155,8 +155,8 @@ fun WaiterPosScreen(
     val BillItems by billViewModel
         .getDoneItems(orderRef = orderRef, orderType = orderType)
         .collectAsState(initial = emptyList())
-    val canOpenBill = BillItems.isNotEmpty()
-
+  //  val canOpenBill = BillItems.isNotEmpty()
+    val canOpenBill = true;
 
     val waiterKitchenRepository = remember {
         WaiterKitchenRepository(FirebaseFirestore.getInstance())
@@ -217,7 +217,7 @@ fun WaiterPosScreen(
     var paymentType by remember { mutableStateOf("CASH") }
     // ✅ NEW: POPUP STATES
     var showKitchen by remember { mutableStateOf(false) }
-    var showBill by remember { mutableStateOf(false) }
+    var showBill by remember { mutableStateOf(false) }//
     var showCategorySelector by remember { mutableStateOf(false) }
 
 
@@ -412,7 +412,7 @@ fun WaiterPosScreen(
                                     value = searchQuery,
                                     onValueChange = {},
                                     modifier = Modifier.fillMaxSize(),
-                                    placeholder = { Text("Search...") },
+                                    placeholder = { Text("Search.m..") },
                                     singleLine = true,
                                     readOnly = true,
                                     enabled = false,

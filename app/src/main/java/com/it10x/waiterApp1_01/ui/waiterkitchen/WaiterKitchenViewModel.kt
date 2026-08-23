@@ -83,9 +83,12 @@ class WaiterKitchenViewModel(
     private var isProcessing = false
 
 
-
+    private val db =
+        AppDatabaseProvider.get(app)
     private val waiterLanRepository =
-        WaiterLanRepository()
+        WaiterLanRepository(
+            posTerminalDao = db.posTerminalDao()
+        )
 
     private val cartRepository = CartRepository(
         AppDatabaseProvider.get(app).cartDao(),
@@ -213,8 +216,8 @@ class WaiterKitchenViewModel(
 
 
 
-//                repository.clearCart(orderType, tableNo)
-//                cartRepository.syncCartCount(tableNo)
+                repository.clearCart(orderType, tableNo)
+                cartRepository.syncCartCount(tableNo)
 
                 Log.d(
                     "WaiterKitchenVM",
