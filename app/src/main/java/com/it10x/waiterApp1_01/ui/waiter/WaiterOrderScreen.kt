@@ -156,7 +156,7 @@ fun WaiterPosScreen(
         .getDoneItems(orderRef = orderRef, orderType = orderType)
         .collectAsState(initial = emptyList())
   //  val canOpenBill = BillItems.isNotEmpty()
-    val canOpenBill = true;
+    val canOpenBill = BillItems.isNotEmpty()
 
     val waiterKitchenRepository = remember {
         WaiterKitchenRepository(FirebaseFirestore.getInstance())
@@ -332,33 +332,47 @@ fun WaiterPosScreen(
                         // ---------------- BILL ITEMS ----------------
 
 
+
+                        // 🧾 Bill Button
                         Button(
                             modifier = Modifier
-                                .size(56.dp)
+                                .size(commonHeight)
                                 .padding(4.dp),
                             enabled = canOpenBill,
                             onClick = {
-                                if (!canOpenBill) return@Button
-                                showBill = true
+                                if (canOpenBill) {
+                                    showBill = true
+                                }
                             },
                             contentPadding = PaddingValues(0.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor =
-                                    if (canOpenBill) Color(0xFF66BB6A) // 🟢 Green when bill exists
-                                    else Color(0xFFBDBDBD),            // ⚪ Grey when no bill
-                                contentColor = Color.White,
-                                disabledContainerColor = Color(0xFFBDBDBD),
-                                disabledContentColor = Color.White
+                                containerColor = if (canOpenBill) {
+                                    Color(0xFF2E7D32) // Green when bill has items
+                                } else {
+                                    MaterialTheme.colorScheme.surfaceVariant // Same as empty cart
+                                },
+                                contentColor = if (canOpenBill) {
+                                    Color.White
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                },
+                                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                             ),
-                            shape = RoundedCornerShape(10.dp)
+                            shape = commonShape
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Receipt,
                                 contentDescription = "Bill",
-                                tint = Color.White,
+                                tint = if (canOpenBill) {
+                                    Color.White
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                },
                                 modifier = Modifier.size(18.dp)
                             )
                         }
+
 
 
                         // 🛒 Cart / Order Button
