@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.it10x.waiterApp1_01.data.pos.entities.PosKotBatchEntity
 import com.it10x.waiterApp1_01.data.pos.entities.PosKotHistoryEntity
 import com.it10x.waiterApp1_01.data.pos.entities.PosKotItemEntity
@@ -473,6 +474,17 @@ ORDER BY createdAt DESC
 """)
     fun getKotNumbers(): Flow<List<String>>
 
+//WEBSOCKET UPDATE
+@Query("DELETE FROM pos_kot_items")
+suspend fun clearAllKotItems()
+
+    @Transaction
+    suspend fun replaceAllKotItems(
+        items: List<PosKotItemEntity>
+    ) {
+        clearAllKotItems()
+        insertAll(items)
+    }
 
 
 }

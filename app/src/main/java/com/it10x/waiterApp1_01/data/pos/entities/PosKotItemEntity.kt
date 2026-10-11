@@ -38,7 +38,7 @@ data class PosKotItemEntity(
 
     val parentId: String?,
     val isVariant: Boolean,
-
+    val discountEligible: Boolean = true,
     val basePrice: Double,
     val finalPrice: Double = 0.0,
     val modifierTotal: Double,

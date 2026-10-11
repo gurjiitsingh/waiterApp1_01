@@ -25,6 +25,7 @@ data class ProductEntity(
     val name: String,
     val price: Double,
     val discountPrice: Double?,
+    val discountEligible: Boolean = true,
     val image: String?,
 
     // =====================================================

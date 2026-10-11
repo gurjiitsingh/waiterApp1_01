@@ -31,6 +31,7 @@ data class PosCartEntity(
 
     val basePrice: Double,
     val finalPrice: Double = 0.0,
+    val discountEligible: Boolean = true,
     val modifierTotal: Double,
     val quantity: Int,
 

@@ -15,8 +15,7 @@ object WaiterLanClient {
         port: Int
     ): WaiterLanApi {
 
-        val baseUrl =
-            "http://$ipAddress:$port/"
+        val baseUrl = "http://$ipAddress:$port/"
 
         val retrofit =
             Retrofit.Builder()

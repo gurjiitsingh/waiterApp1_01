@@ -208,6 +208,7 @@ class WaiterKitchenViewModel(
                     withContext(Dispatchers.IO) {
 
                         waiterLanRepository.sendOrderToDesktop(
+
                             cartList = latestCart,
                             tableNo = tableNo,
                             tableName = tableName,

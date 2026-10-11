@@ -101,14 +101,17 @@ import kotlin.math.log
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.lifecycleScope
 import com.it10x.waiterApp1_01.auth.PosLoginViewModel
 import com.it10x.waiterApp1_01.ui.login.PosLoginScreen
 import com.it10x.waiterApp1_01.auth.PosSessionManager
 import com.it10x.waiterApp1_01.data.pos.lan.WaiterLanManager
+import com.it10x.waiterApp1_01.data.pos.repository.WaiterPosUpdateReceiver
 import com.it10x.waiterApp1_01.viewmodel.ProductSyncViewModel
 
 class MainActivity : ComponentActivity() {
     private lateinit var globalOrderSyncManager: GlobalOrderSyncManager
+    private var waiterPosUpdateReceiver: WaiterPosUpdateReceiver? = null
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,6 +120,17 @@ class MainActivity : ComponentActivity() {
         val db = AppDatabaseProvider.get(this)
 
         WaiterLanManager.start(this)
+
+
+        // Start receiving live updates from the Electron PC POS.
+        waiterPosUpdateReceiver = WaiterPosUpdateReceiver(
+            db.posTerminalDao(),
+            db.kotItemDao()
+        )
+
+        lifecycleScope.launch {
+            waiterPosUpdateReceiver?.connect()
+        }
 
         //PRINTER SETTING UPLOAD
         // ================= PRINTER SYSTEM =================
@@ -754,7 +768,11 @@ class MainActivity : ComponentActivity() {
 
 
     override fun onDestroy() {
+
+        waiterPosUpdateReceiver?.disconnect()
+        waiterPosUpdateReceiver = null
         super.onDestroy()
+
         // Stop listener when activity is destroyed
         globalOrderSyncManager.stopListening()
     }
@@ -791,6 +809,11 @@ class MainActivity : ComponentActivity() {
             )
         }
     }
+
+
+
+
+
 
 }
 

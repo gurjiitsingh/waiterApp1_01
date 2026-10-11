@@ -79,6 +79,7 @@ class ProductSyncRepository(
                     if (it <= 0.0) error("Invalid product price for ${doc.id}")
                 },
                 discountPrice = (data["discountPrice"] as? Number)?.toDouble(),
+                discountEligible = data["discountEligible"] as? Boolean ?: true,
                 image = data["image"] as? String,
 
                 // ------------ FOOD TYPE ⭐ NEW ------------

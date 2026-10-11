@@ -47,20 +47,7 @@ class WaiterLanRepository(
 
             } else {
 
-//                val ip =
-//                    terminal.ipAddress
-//
-//                val port =
-//                    terminal.port
-//
-//                val url =
-//                    "http://$ip:$port/"
-//
-//                Toast.makeText(
-//                    context,
-//                    "Sending KOT to:\n$ip:$port",
-//                    Toast.LENGTH_LONG
-//                ).show()
+
 
                 if (terminal.ipAddress.isBlank()) {
 
@@ -175,7 +162,7 @@ class WaiterLanRepository(
         deviceId: String,
         deviceName: String?,
     ): Boolean {
-     //   logPosTerminal()
+      //   logPosTerminal()
         return try {
 
             if (cartList.isEmpty()) {
@@ -383,6 +370,8 @@ class WaiterLanRepository(
                             cartItem.categoryId ?: ""
                         )
 
+
+
                         addProperty(
                             "createdById",
                             cartItem.createdById ?: ""
@@ -401,6 +390,14 @@ class WaiterLanRepository(
                         addProperty(
                             "isVariant",
                             cartItem.isVariant
+                        )
+                        Log.d(
+                            "WAITER_LAN",
+                            "SEND discountEligible: ${cartItem.name} = ${cartItem.discountEligible}"
+                        )
+                        addProperty(
+                            "discountEligible",
+                            cartItem.discountEligible
                         )
 
                         addProperty(

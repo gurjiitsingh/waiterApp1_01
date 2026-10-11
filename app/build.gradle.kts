@@ -69,8 +69,8 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
-
-
+    //WEB SOCKET
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     // AndroidX / Compose BOM
     implementation(platform("androidx.compose:compose-bom:2024.05.00"))
     implementation("androidx.compose.ui:ui")
