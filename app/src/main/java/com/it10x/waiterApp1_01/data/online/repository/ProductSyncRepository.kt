@@ -111,8 +111,20 @@ class ProductSyncRepository(
 
                 // ------------ TAX ------------
 
-                taxRate = (data["taxRate"] as? Number)?.toDouble(),
-                taxType = data["taxType"] as? String,
+                taxCategory = data["taxCategory"] as? String
+                    ?: "FOOD_GST",
+
+                taxRate = (data["taxRate"] as? Number)
+                    ?.toDouble(),
+
+                taxType = data["taxType"] as? String
+                    ?: "exclusive",
+
+                taxRate1 = (data["taxRate1"] as? Number)
+                    ?.toDouble(),
+
+                taxType1 = data["taxType1"] as? String
+                    ?: "exclusive",
 
                 // ------------ META ------------
 

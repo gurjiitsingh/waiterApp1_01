@@ -35,7 +35,7 @@ class GlobalOrderSyncManager(
         java.util.concurrent.ConcurrentHashMap<String, kotlinx.coroutines.sync.Mutex>()
 
 
-
+    private var waiterOrderSyncEnabled = false
     private val lastProcessedMap = ConcurrentHashMap<String, Long>()
 
 
@@ -429,6 +429,11 @@ class GlobalOrderSyncManager(
     // Listen to only MAIN POS orders
 
 private fun startWaiterListener() {
+
+    if (!waiterOrderSyncEnabled) {
+        Log.d("SYNC", "⏸️ Waiter order sync is disabled")
+        return
+    }
         Log.d("SYNC", "✅ waiter is run on time")
         waiterListener?.remove()
         waiterListener = null
