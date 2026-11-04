@@ -421,6 +421,11 @@ class WaiterLanRepository(
                         )
 
                         addProperty(
+                            "taxCategory",
+                            cartItem.taxCategory
+                                ?: "FOOD_GST"
+                        )
+                        addProperty(
                             "taxRate",
                             cartItem.taxRate
                         )
@@ -428,6 +433,17 @@ class WaiterLanRepository(
                         addProperty(
                             "taxType",
                             cartItem.taxType
+                                ?: "exclusive"
+                        )
+
+                        addProperty(
+                            "taxRate1",
+                            cartItem.taxRate1
+                        )
+
+                        addProperty(
+                            "taxType1",
+                            cartItem.taxType1
                                 ?: "exclusive"
                         )
 

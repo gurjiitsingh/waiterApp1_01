@@ -210,8 +210,12 @@ class WaiterPosUpdateReceiver(
                                                 item.optDouble("modifierTotal", 0.0),
 
                                             quantity = item.optInt("quantity", 0),
+                                            taxCategory = item.optString("taxCategory"),
                                             taxRate = item.optDouble("taxRate", 0.0),
                                             taxType = item.optString("taxType"),
+
+                                            taxRate1 = item.optDouble("taxRate1", 0.0),
+                                            taxType1 = item.optString("taxType1"),
 
                                             // Do not treat PC items as new,
                                             // printable waiter KOT requests.

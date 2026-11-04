@@ -64,6 +64,8 @@ class TableSnapshotListener(
                                 quantity = (doc.getLong("quantity") ?: 1L).toInt(),
                                 taxRate = 0.0,
                                 taxType = "exclusive",
+                                taxRate1 = 0.0,
+                                taxType1 = "exclusive",
                                 note = doc.getString("note") ?: "",
                                 modifiersJson = "",
                                 kitchenPrintReq = true,

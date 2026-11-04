@@ -349,8 +349,11 @@ class KitchenViewModel(
                     finalPrice = finalPrice,
                     modifierTotal = modifierTotal,
                     quantity = cart.quantity,
+                    taxCategory = cart.taxCategory,
                     taxRate = cart.taxRate,
                     taxType = cart.taxType,
+                    taxRate1 = cart.taxRate1,
+                    taxType1 = cart.taxType1,
                     note = cart.note,
                     modifiersJson = cart.modifiersJson,
                     kitchenPrintReq = cart.kitchenPrintReq,
@@ -612,6 +615,10 @@ class KitchenViewModel(
                     quantity = (item["quantity"] as? Number)?.toInt() ?: 1,
                     taxRate = 0.0,
                     taxType = "exclusive",
+                    taxCategory = item["taxCategory"]?.toString() ?: "",
+
+                    taxRate1 = 0.0,
+                    taxType1 = "exclusive",
                     note = item["note"]?.toString() ?: "",
                     modifiersJson = "",
                     kitchenPrintReq = false,
@@ -707,8 +714,11 @@ class KitchenViewModel(
                     finalPrice = 0.0,
                     modifierTotal = 0.0,
                     quantity = cart.quantity,
+                    taxCategory = cart.taxCategory,
                     taxRate = cart.taxRate,
                     taxType = cart.taxType,
+                    taxRate1 = cart.taxRate1,
+                    taxType1 = cart.taxType1,
                     note = cart.note,
                     modifiersJson = cart.modifiersJson,
                     kitchenPrinted = true,
@@ -909,11 +919,11 @@ class KitchenViewModel(
                         quantity =
                             cart.quantity,
 
-                        taxRate =
-                            cart.taxRate,
-
-                        taxType =
-                            cart.taxType,
+                        taxCategory = cart.taxCategory,
+                        taxRate = cart.taxRate,
+                        taxType = cart.taxType,
+                        taxRate1 = cart.taxRate1,
+                        taxType1 = cart.taxType1,
 
                         note =
                             cart.note,

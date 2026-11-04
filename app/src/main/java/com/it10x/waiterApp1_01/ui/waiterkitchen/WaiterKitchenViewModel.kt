@@ -623,8 +623,11 @@ class WaiterKitchenViewModel(
                     finalPrice = cart.finalPrice,
                     modifierTotal = cart.modifierTotal,
                     quantity = cart.quantity,
+                    taxCategory = cart.taxCategory,
                     taxRate = cart.taxRate,
                     taxType = cart.taxType,
+                    taxRate1 = cart.taxRate1,
+                    taxType1 = cart.taxType1,
                     note = cart.note,
                     modifiersJson = cart.modifiersJson,
                     kitchenPrinted = true,
@@ -841,11 +844,11 @@ class WaiterKitchenViewModel(
                         quantity =
                             cart.quantity,
 
-                        taxRate =
-                            cart.taxRate,
-
-                        taxType =
-                            cart.taxType,
+                        taxCategory = cart.taxCategory,
+                        taxRate = cart.taxRate,
+                        taxType = cart.taxType,
+                        taxRate1 = cart.taxRate1,
+                        taxType1 = cart.taxType1,
 
                         note =
                             cart.note,
